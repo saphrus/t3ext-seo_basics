@@ -60,7 +60,7 @@ class SeoModule extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule {
 	/**
 	 * @var array
 	 */
-	protected $pathCaches   = array();
+	protected $pathData   = array();
 
 	/**
 	 * Does some initial work for the page
@@ -198,7 +198,7 @@ class SeoModule extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule {
 			$uidList = $GLOBALS['TYPO3_DB']->cleanIntList(implode(',', $pages));
 			$this->loadLanguageOverlays($uidList);
 			if (\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('realurl')) {
-				$this->loadPathCache($uidList);
+				$this->loadPathData($uidList);
 			}
 
 			// Render information table
@@ -272,7 +272,7 @@ class SeoModule extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule {
 			}
 
 			// render main language (or specifically selected language) row
-			$item['pathcache'] = $this->pathCaches[$itemId][($this->langOnly ? $this->langOnly : 0)];
+			$item['pathdata'] = $this->pathData[$itemId][($this->langOnly ? $this->langOnly : 0)];
 
 
 			// row title
@@ -295,7 +295,7 @@ class SeoModule extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule {
 			if ($numRows > 1) {
 				foreach ($translations as $langId => $item) {
 					$item['sys_language'] = $langId;
-					$item['pathcache'] = $this->pathCaches[$itemId][$langId];
+					$item['pathdata'] = $this->pathData[$itemId][$langId];
 					$tRows = $this->renderRowContent($item);
 					// compile row
 					foreach ($tRows as $singleRow) {
@@ -341,7 +341,7 @@ class SeoModule extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule {
 		$row2 = array();
 
 		if ($cmd != 'edit') {
-			$row1[] = $item['pathcache'];
+			$row1[] = $item['pathdata'];
 			$row1[] = $item['tx_seo_titletag'];
 			$row1[] = $item['keywords'];
 			$row1[] = $item['description'];
@@ -417,23 +417,23 @@ class SeoModule extends \TYPO3\CMS\Backend\Module\AbstractFunctionModule {
 	 * @param string $uidList The Page Uids
 	 * @return void
      */
-	protected function loadPathCache($uidList) {
+	protected function loadPathData($uidList) {
 
 		// building where clause
 		$where = ($this->langOnly || $this->langOnly === 0 ? ' AND language_id = ' . $this->langOnly : '');
 
 		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery(
 			'page_id, language_id, pagepath',
-			'tx_realurl_pathcache',
+			'tx_realurl_pathdata',
 			'page_id IN ('. $uidList .') ' . $where,
 			'',
 			'language_id ASC, expire ASC'
 		);
 
 		// Traverse result
-		$this->pathCaches = array();
+		$this->pathData = array();
 		while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-			$this->pathCaches[$row['page_id']][$row['language_id']] = $row['pagepath'];
+			$this->pathData[$row['page_id']][$row['language_id']] = $row['pagepath'];
 		}
 	}
 

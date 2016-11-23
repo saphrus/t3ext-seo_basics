@@ -20,7 +20,7 @@ $EM_CONF[$_EXTKEY] = array(
 		'conflicts' => array(
 		),
 		'suggests' => array(
-			'realurl' => '0.0.0-0.0.0',
+			'realurl' => '2.1.5-0.0.0',
 			'cooluri' => '0.0.0-0.0.0',
 		),
 	),
